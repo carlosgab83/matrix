@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "matrix.proto";
+
+service PriceIngestor {
+  rpc IngestPrice (PriceMessage) returns (IngestResponse);
+}
+
+message PriceMessage {
+  string symbol = 1;
+	double price = 2;
+	string currency = 3;
+	int64 timestamp = 4;
+}
+
+message IngestResponse {
+  bool success = 1;
+  string message = 2;
+}

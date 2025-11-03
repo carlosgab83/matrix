@@ -1,0 +1,44 @@
+time=2025-10-18T02:11:57.504Z level=INFO msg="Application started" app=Neo
+time=2025-10-18T04:38:03.482Z level=INFO msg="Application started" app=Neo
+time=2025-10-18T04:38:03.483Z level=DEBUG msg=Running...
+time=2025-10-18T04:38:04.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD5
+time=2025-10-18T04:38:04.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD5
+time=2025-10-18T04:38:04.484Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD2
+time=2025-10-18T04:38:04.484Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD2
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD6
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD6
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD2
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD2
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD3
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD5
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD3
+time=2025-10-18T04:38:05.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD5
+time=2025-10-18T04:38:06.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD5
+time=2025-10-18T04:38:06.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD5
+time=2025-10-18T04:38:06.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD4
+time=2025-10-18T04:38:06.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD4
+time=2025-10-18T04:38:06.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD2
+time=2025-10-18T04:38:06.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD2
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD5
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD5
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD3
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD2
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD6
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD2
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD3
+time=2025-10-18T04:38:07.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD6
+time=2025-10-18T04:38:08.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD5
+time=2025-10-18T04:38:08.483Z level=DEBUG msg="Received symbol from buffer" symbol=ETHUSD2
+time=2025-10-18T04:38:08.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD2
+time=2025-10-18T04:38:08.483Z level=DEBUG msg="Tick: Fetch price for symbol" symbol=ETHUSD5
+time=2025-10-18T04:38:08.869Z level=INFO msg="Received signal, shutting down gracefully" signal=interrupt
+time=2025-10-18T04:38:08.869Z level=INFO msg="Stopping collector..."
+time=2025-10-18T04:38:08.869Z level=INFO msg="Application stopped"
+time=2025-11-02T21:44:38.062Z level=INFO msg="Application started" app=Neo
+time=2025-11-02T21:44:43.875Z level=INFO msg="Fetched price" symbol=BTCUSD price=110020 currency=USD timestamp=2025-11-02T21:44:43.875Z
+time=2025-11-02T21:44:44.166Z level=INFO msg="Fetched price" symbol=ETHUSD price=3858.01 currency=USD timestamp=2025-11-02T21:44:44.166Z
+time=2025-11-02T21:44:48.360Z level=INFO msg="Fetched price" symbol=BTCUSD price=110020 currency=USD timestamp=2025-11-02T21:44:48.360Z
+time=2025-11-02T21:44:48.900Z level=INFO msg="Fetched price" symbol=ETHUSD price=3858.01 currency=USD timestamp=2025-11-02T21:44:48.900Z
+time=2025-11-02T21:44:50.356Z level=INFO msg="Received signal, shutting down gracefully" signal=interrupt
+time=2025-11-02T21:44:50.356Z level=INFO msg="Stopping collector..."
+time=2025-11-02T21:44:50.356Z level=INFO msg="Application stopped"

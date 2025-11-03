@@ -1,0 +1,6 @@
+{
+  "log_level": "info",
+  "log_file_path": "",
+  "database_connection_string": "database_connection_string",
+  "event_bus_id": 1
+}

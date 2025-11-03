@@ -1,0 +1,23 @@
+{
+  "log_level": "info",
+  "log_file_path": "",
+  "default_fetch_interval_seconds": 5,
+  "workers_count": 2,
+  "symbols": [
+    {
+      "nemo": "BTCUSD",
+      "name": "BTC-USD",
+      "fetch_interval_seconds": 5
+    },
+    {
+      "nemo": "ETHUSD",
+      "name": "ETH-USD",
+      "fetch_interval_seconds": 5
+    },
+    {
+      "nemo": "ETHUSD2",
+      "name": "ETH-USD",
+      "fetch_interval_seconds": 15
+    }
+  ]
+}
