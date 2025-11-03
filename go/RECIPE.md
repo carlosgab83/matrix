@@ -41,8 +41,8 @@ Then you have to use docker:
 `docker run --rm -it -v $(pwd):/app neo:latest bash`
 `docker run --rm -it -v $(pwd):/app neo:latest go run cmd/neo/main.go`
 
-### Run Neo & Trinity
-`docker run --rm -it -v $(pwd):/app -w /app neo:latest bash cmd/nt.bash`
+### Run Neo & Morpheus
+`docker run --rm -it -v $(pwd):/app -w /app neo:latest bash cmd/nm.bash`
 
 
 

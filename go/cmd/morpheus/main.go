@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/carlosgab83/matrix/go/internal/trinity/platform/entrypoint"
+	"github.com/carlosgab83/matrix/go/internal/morpheus/platform/entrypoint"
 )
 
 func main() {
-	fmt.Println("Trinity price ingestor starting...")
+	fmt.Println("Morpheus price ingestor starting...")
 
 	myApp, err := entrypoint.NewApp()
 	if err != nil {
