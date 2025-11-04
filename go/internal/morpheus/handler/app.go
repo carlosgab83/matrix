@@ -72,11 +72,11 @@ func (app *App) Run() {
 	grpcServer := grpc.NewServer()
 	matrix_proto.RegisterPriceIngestorServer(grpcServer, grpcServerAdapter)
 
-	log.Println("Servidor gRPC escuchando en :50051")
+	log.Println("gRPC server listening on :50051")
 
 	go func() {
 		if err := grpcServer.Serve(listener); err != nil {
-			log.Fatalf("Error al iniciar gRPC server: %v", err)
+			log.Fatalf("Error starting gRPC server: %v", err)
 		}
 	}()
 
