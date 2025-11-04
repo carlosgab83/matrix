@@ -1,10 +1,9 @@
-package adapter
+package ingestion
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/carlosgab83/matrix/go/internal/neo/port"
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 	proto "github.com/carlosgab83/matrix/go/internal/shared/proto/matrix.proto"
 	"google.golang.org/grpc"
@@ -18,7 +17,7 @@ type GRPCPriceIngestor struct {
 }
 
 // NewGRPCPriceIngestor creates a new gRPC adapter
-func NewGRPCPriceIngestor(address string) (port.PriceIngestor, error) {
+func NewGRPCPriceIngestor(address string) (Ingestor, error) {
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to gRPC server: %w", err)

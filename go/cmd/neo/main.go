@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/carlosgab83/matrix/go/internal/neo/platform/entrypoint"
+	"github.com/carlosgab83/matrix/go/internal/neo/handler"
 )
 
 func main() {
 	fmt.Println("Neo price collector starting...")
 
-	myApp, err := entrypoint.NewApp()
+	myApp, err := handler.NewApp()
 	if err != nil {
 		fmt.Printf("Failed to initialize app: %v\n", err)
 		return

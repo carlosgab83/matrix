@@ -1,4 +1,4 @@
-package adapter
+package ingestion
 
 import (
 	"context"
@@ -6,17 +6,16 @@ import (
 
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 	matrix_proto "github.com/carlosgab83/matrix/go/internal/shared/proto/matrix.proto"
-	trinity_port "github.com/carlosgab83/matrix/go/internal/trinity/port"
 )
 
 type GRPCPriceIngestorServer struct {
 	matrix_proto.UnimplementedPriceIngestorServer
-	priceService trinity_port.PriceService
+	IngestorService IngestorService
 }
 
-func NewGRPCPriceIngestorServer(priceService trinity_port.PriceService) *GRPCPriceIngestorServer {
+func NewGRPCPriceIngestorServer(ingestorService IngestorService) *GRPCPriceIngestorServer {
 	return &GRPCPriceIngestorServer{
-		priceService: priceService,
+		IngestorService: ingestorService,
 	}
 }
 
@@ -30,7 +29,7 @@ func (s *GRPCPriceIngestorServer) IngestPrice(ctx context.Context, req *matrix_p
 	}
 
 	// Call the domain service
-	err := s.priceService.IngestPrice(ctx, price)
+	err := s.IngestorService.IngestPrice(ctx, price)
 	if err != nil {
 		return &matrix_proto.IngestResponse{
 			Success: false,

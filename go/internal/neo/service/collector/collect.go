@@ -5,22 +5,22 @@ import (
 	"time"
 
 	"github.com/carlosgab83/matrix/go/internal/neo/domain"
-	"github.com/carlosgab83/matrix/go/internal/neo/port"
+	"github.com/carlosgab83/matrix/go/internal/neo/integration/ingestion"
 	"github.com/carlosgab83/matrix/go/internal/neo/service/collector/symbol"
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
-	shared_port "github.com/carlosgab83/matrix/go/internal/shared/port"
+	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 )
 
 type Collector struct {
-	Config        domain.Config
-	Logger        shared_port.Logger
-	Buffer        chan domain.Symbol
-	Ctx           context.Context
-	Cancel        context.CancelFunc
-	PriceIngestor port.PriceIngestor
+	Config   domain.Config
+	Logger   logging.Logger
+	Buffer   chan domain.Symbol
+	Ctx      context.Context
+	Cancel   context.CancelFunc
+	Ingestor ingestion.Ingestor
 }
 
-func NewCollector(cfg domain.Config, logger shared_port.Logger, priceIngestor port.PriceIngestor) *Collector {
+func NewCollector(cfg domain.Config, logger logging.Logger, ingestor ingestion.Ingestor) *Collector {
 	buffer := make(chan domain.Symbol, cfg.WorkersCount*2)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -32,12 +32,12 @@ func NewCollector(cfg domain.Config, logger shared_port.Logger, priceIngestor po
 	}
 
 	return &Collector{
-		Config:        cfg,
-		Logger:        logger,
-		Buffer:        buffer,
-		Ctx:           ctx,
-		Cancel:        cancel,
-		PriceIngestor: priceIngestor,
+		Config:   cfg,
+		Logger:   logger,
+		Buffer:   buffer,
+		Ctx:      ctx,
+		Cancel:   cancel,
+		Ingestor: ingestor,
 	}
 }
 
@@ -101,7 +101,7 @@ func (c *Collector) processSymbol() {
 			"timestamp", price.Timestamp)
 
 		// Send price to gRPC
-		if err := c.PriceIngestor.IngestPrice(c.Ctx, price); err != nil {
+		if err := c.Ingestor.IngestPrice(c.Ctx, price); err != nil {
 			c.Logger.Error("Failed to ingest price via gRPC",
 				"symbol", price.Symbol,
 				"error", err)

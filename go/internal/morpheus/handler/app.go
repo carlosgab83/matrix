@@ -1,4 +1,4 @@
-package entrypoint
+package handler
 
 import (
 	"log"
@@ -7,40 +7,42 @@ import (
 	"os/signal"
 	"syscall"
 
-	shared_platform "github.com/carlosgab83/matrix/go/internal/shared/platform"
-	shared_port "github.com/carlosgab83/matrix/go/internal/shared/port"
+	"github.com/carlosgab83/matrix/go/internal/morpheus/domain"
+	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/ingestion"
+	"github.com/carlosgab83/matrix/go/internal/morpheus/service"
+	"github.com/carlosgab83/matrix/go/internal/shared/integration/configuration"
+	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 	matrix_proto "github.com/carlosgab83/matrix/go/internal/shared/proto/matrix.proto"
-	"github.com/carlosgab83/matrix/go/internal/trinity/adapter"
-	"github.com/carlosgab83/matrix/go/internal/trinity/domain"
-	"github.com/carlosgab83/matrix/go/internal/trinity/service"
 	"google.golang.org/grpc"
+	// Driver PostgreSQL
+	// _ "github.com/lib/pq"
 )
 
 type App struct {
 	Name   string
 	Config domain.Config
-	Logger shared_port.Logger
+	Logger logging.Logger
 }
 
 const (
-	AppName    = "Trinity"
-	ConfigFile = "config/trinity.json"
+	AppName    = "Morpheus"
+	ConfigFile = "config/morpheus.json"
 )
 
 func NewApp() (*App, error) {
 	var cfg domain.Config
-	if err := shared_platform.LoadConfig(&cfg, ConfigFile); err != nil {
+	if err := configuration.LoadConfig(&cfg, AppName, ConfigFile); err != nil {
 		log.Fatalf("Error loading config: %v\n", err)
 		return nil, err
 	}
 
-	logger, err := shared_platform.NewLogger(cfg.LogFilePath, cfg.LogLevel)
+	logger, err := logging.NewLogger(cfg.CommonConfig)
 	if err != nil {
 		log.Fatalf("Error creating logger: %v\n", err)
 		return nil, err
 	}
 
-	logger.Logger.Info("Application started", "app", AppName)
+	logger.Info("Application started", "app", AppName)
 
 	return &App{
 		Name:   AppName,
@@ -54,16 +56,16 @@ func (app *App) Run() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	// 1. Create the domain service (core)
-	priceService := service.NewPriceIngestorService(app.Logger)
+	// Create the domain service (inject dependencies via constructor)
+	ingestorService := service.NewIngestorService(app.Logger)
 
-	// 2. Create the gRPC adapter (inject dependency)
-	grpcServerAdapter := adapter.NewGRPCPriceIngestorServer(priceService)
+	// Create the gRPC server adapter (inject domain service)
+	grpcServerAdapter := ingestion.NewGRPCPriceIngestorServer(ingestorService)
 
-	// 3. Set up gRPC infrastructure
-	listener, err := net.Listen("tcp", ":50051")
+	// Set up gRPC infrastructure
+	listener, err := net.Listen("tcp", app.Config.IngestorAddress)
 	if err != nil {
-		app.Logger.Error("Failed to listen on port 50051", "error", err)
+		app.Logger.Error("Failed to listen on ingestor address", "address", app.Config.IngestorAddress, "error", err)
 		return
 	}
 

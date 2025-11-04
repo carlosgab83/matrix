@@ -1,4 +1,4 @@
-package port
+package ingestion
 
 import (
 	"context"
@@ -6,6 +6,6 @@ import (
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 )
 
-type PriceService interface {
+type IngestorService interface {
 	IngestPrice(ctx context.Context, price *shared_domain.Price) error
 }

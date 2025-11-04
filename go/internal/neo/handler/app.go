@@ -1,4 +1,4 @@
-package entrypoint
+package handler
 
 import (
 	"log"
@@ -6,17 +6,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/carlosgab83/matrix/go/internal/neo/adapter"
 	"github.com/carlosgab83/matrix/go/internal/neo/domain"
+	"github.com/carlosgab83/matrix/go/internal/neo/integration/ingestion"
 	"github.com/carlosgab83/matrix/go/internal/neo/service/collector"
-	shared_platform "github.com/carlosgab83/matrix/go/internal/shared/platform"
-	shared_port "github.com/carlosgab83/matrix/go/internal/shared/port"
+	"github.com/carlosgab83/matrix/go/internal/shared/integration/configuration"
+	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 )
 
 type App struct {
 	Name   string
 	Config domain.Config
-	Logger shared_port.Logger
+	Logger logging.Logger
 }
 
 const (
@@ -26,7 +26,7 @@ const (
 
 func NewApp() (*App, error) {
 	var cfg domain.Config
-	if err := shared_platform.LoadConfig(&cfg, ConfigFile); err != nil {
+	if err := configuration.LoadConfig(&cfg, AppName, ConfigFile); err != nil {
 		log.Fatalf("Error loading config: %v\n", err)
 		return nil, err
 	}
@@ -35,13 +35,13 @@ func NewApp() (*App, error) {
 		cfg.WorkersCount = 100
 	}
 
-	logger, err := shared_platform.NewLogger(cfg.LogFilePath, cfg.LogLevel)
+	logger, err := logging.NewLogger(cfg.CommonConfig)
 	if err != nil {
 		log.Fatalf("Error creating logger: %v\n", err)
 		return nil, err
 	}
 
-	logger.Logger.Info("Application started", "app", AppName)
+	logger.Info("Application started", "app", AppName)
 
 	return &App{
 		Name:   AppName,
@@ -55,16 +55,14 @@ func (app *App) Run() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	// Create gRPC price ingestor
-	priceIngestor, err := adapter.NewGRPCPriceIngestor("localhost:50051")
+	ingestor, err := ingestion.NewIngestor(app.Config)
 	if err != nil {
-		app.Logger.Error("Failed to create gRPC client", "error", err)
+		app.Logger.Error("Failed to create Ingestor client", "error", err)
 		return
 	}
-	defer priceIngestor.(*adapter.GRPCPriceIngestor).Close()
+	defer ingestor.Close()
 
-	// Create collector with dependencies
-	coll := collector.NewCollector(app.Config, app.Logger, priceIngestor)
+	coll := collector.NewCollector(app.Config, app.Logger, ingestor)
 	go coll.Collect()
 
 	sig := <-sigChan
