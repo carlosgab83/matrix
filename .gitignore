@@ -30,3 +30,14 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Recipe files (development notes)
+RECIPE*
+**/RECIPE*
+
+# Log files and directories
+*.log
+log/
+**/log/
+logs/
+**/logs/
