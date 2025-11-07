@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"log"
 	"net"
 	"os"
@@ -55,12 +56,13 @@ func (app *App) Run() {
 	app.Logger.Debug("Running...")
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	// Create the domain service (inject dependencies via constructor)
-	ingestorService := service.NewIngestorService(app.Logger)
+	ingestorService := service.NewIngestorService(ctx, app.Logger)
 
 	// Create the gRPC server adapter (inject domain service)
-	grpcServerAdapter := ingestion.NewGRPCPriceIngestorServer(ingestorService)
+	grpcServerAdapter := ingestion.NewGRPCPriceIngestorServer(ingestorService, app.Logger)
 
 	// Set up gRPC infrastructure
 	listener, err := net.Listen("tcp", app.Config.IngestorAddress)
@@ -82,6 +84,8 @@ func (app *App) Run() {
 
 	sig := <-sigChan
 	app.Logger.Info("Received signal, shutting down gracefully", "signal", sig)
+	cancel()
+	grpcServer.GracefulStop()
 	app.Logger.Info("Application stopped")
 	app.Logger.Close()
 }

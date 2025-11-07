@@ -9,15 +9,24 @@ import (
 
 type IngestorService struct {
 	Logger logging.Logger
+	Ctx    context.Context
 }
 
-func NewIngestorService(logger logging.Logger) *IngestorService {
+func NewIngestorService(ctx context.Context, logger logging.Logger) *IngestorService {
 	return &IngestorService{
 		Logger: logger,
+		Ctx:    ctx,
 	}
 }
 
-func (s *IngestorService) IngestPrice(ctx context.Context, price *shared_domain.Price) error {
+func (s *IngestorService) IngestPrice(price *shared_domain.Price) error {
+	select {
+	case <-s.Ctx.Done():
+		s.Logger.Info("Morpheus stop due", "context", s.Ctx.Err())
+		return s.Ctx.Err()
+	default:
+	}
+
 	s.Logger.Info("Morpheus Processing price",
 		"symbol", price.Symbol,
 		"price", price.Price,

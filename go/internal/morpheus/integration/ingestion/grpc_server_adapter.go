@@ -1,44 +1,56 @@
 package ingestion
 
 import (
-	"context"
+	"fmt"
+	"io"
 	"time"
 
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
+	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 	matrix_proto "github.com/carlosgab83/matrix/go/internal/shared/proto/matrix.proto"
 )
 
 type GRPCPriceIngestorServer struct {
 	matrix_proto.UnimplementedPriceIngestorServer
-	IngestorService IngestorService
+	IngestorService IngestorServiceInterface
+	Logger          logging.Logger
 }
 
-func NewGRPCPriceIngestorServer(ingestorService IngestorService) *GRPCPriceIngestorServer {
+func NewGRPCPriceIngestorServer(ingestorService IngestorServiceInterface, logger logging.Logger) *GRPCPriceIngestorServer {
 	return &GRPCPriceIngestorServer{
 		IngestorService: ingestorService,
+		Logger:          logger,
 	}
 }
 
-func (s *GRPCPriceIngestorServer) IngestPrice(ctx context.Context, req *matrix_proto.PriceMessage) (*matrix_proto.IngestResponse, error) {
+func (s *GRPCPriceIngestorServer) IngestPrice(stream matrix_proto.PriceIngestor_IngestPriceServer) error {
 	// Convert from proto to domain (adapter's responsibility)
-	price := &shared_domain.Price{
-		Symbol:    req.Symbol,
-		Price:     req.Price,
-		Currency:  req.Currency,
-		Timestamp: time.Unix(req.Timestamp, 0),
-	}
+	for {
+		priceMsg, err := stream.Recv()
+		if err == io.EOF {
+			stream.SendAndClose(&matrix_proto.IngestResponse{
+				Success: true,
+			})
 
-	// Call the domain service
-	err := s.IngestorService.IngestPrice(ctx, price)
-	if err != nil {
-		return &matrix_proto.IngestResponse{
-			Success: false,
-			Message: err.Error(),
-		}, nil
-	}
+			return nil
+		}
 
-	return &matrix_proto.IngestResponse{
-		Success: true,
-		Message: "Price ingested successfully",
-	}, nil
+		if err != nil {
+			return fmt.Errorf("receiving price error: %w", err)
+		}
+
+		price := &shared_domain.Price{
+			Symbol:    priceMsg.Symbol,
+			Price:     priceMsg.Price,
+			Currency:  priceMsg.Currency,
+			Timestamp: time.Unix(priceMsg.Timestamp, 0),
+		}
+
+		// Call the domain service
+		err = s.IngestorService.IngestPrice(price)
+		if err != nil {
+			err = fmt.Errorf("ingesting price %v error: %w", price, err)
+			s.Logger.Error("error ingesting price", "error", err)
+		}
+	}
 }
