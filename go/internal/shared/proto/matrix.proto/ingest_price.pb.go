@@ -153,9 +153,9 @@ const file_ingest_price_proto_rawDesc = "" +
 	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\"D\n" +
 	"\x0eIngestResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2J\n" +
-	"\rPriceIngestor\x129\n" +
-	"\vIngestPrice\x12\x13.proto.PriceMessage\x1a\x15.proto.IngestResponseB\x0eZ\fmatrix.protob\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessage2L\n" +
+	"\rPriceIngestor\x12;\n" +
+	"\vIngestPrice\x12\x13.proto.PriceMessage\x1a\x15.proto.IngestResponse(\x01B\x0eZ\fmatrix.protob\x06proto3"
 
 var (
 	file_ingest_price_proto_rawDescOnce sync.Once
