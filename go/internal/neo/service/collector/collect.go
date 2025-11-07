@@ -14,15 +14,12 @@ import (
 type Collector struct {
 	Config   domain.Config
 	Logger   logging.Logger
-	Buffer   chan domain.Symbol
 	Ctx      context.Context
 	Cancel   context.CancelFunc
 	Ingestor ingestion.Ingestor
 }
 
 func NewCollector(cfg domain.Config, logger logging.Logger, ingestor ingestion.Ingestor) *Collector {
-	buffer := make(chan domain.Symbol, cfg.WorkersCount*2)
-
 	ctx, cancel := context.WithCancel(context.Background())
 
 	for _, sym := range cfg.Symbols {
@@ -34,7 +31,6 @@ func NewCollector(cfg domain.Config, logger logging.Logger, ingestor ingestion.I
 	return &Collector{
 		Config:   cfg,
 		Logger:   logger,
-		Buffer:   buffer,
 		Ctx:      ctx,
 		Cancel:   cancel,
 		Ingestor: ingestor,
@@ -42,27 +38,29 @@ func NewCollector(cfg domain.Config, logger logging.Logger, ingestor ingestion.I
 }
 
 func (c *Collector) Collect() {
+	buffer := make(chan domain.Symbol, c.Config.WorkersCount*2)
+
 	for _, sym := range c.Config.Symbols {
-		go c.startTickerForSymbol(sym)
+		go c.startSymbolTicker(sym, buffer)
 	}
 
 	for i := 0; i < c.Config.WorkersCount; i++ {
-		go c.processSymbol()
+		go c.startSymbolWorker(buffer)
 	}
 
 	<-c.Ctx.Done()
 	c.Logger.Info("Collector stopped")
-	close(c.Buffer)
+	close(buffer)
 }
 
-func (c *Collector) startTickerForSymbol(sym domain.Symbol) {
+func (c *Collector) startSymbolTicker(sym domain.Symbol, buffer chan<- domain.Symbol) {
 	ticker := time.NewTicker(time.Duration(sym.FetchIntervalSeconds) * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			c.Buffer <- sym
+			buffer <- sym
 			c.Logger.Debug("Tick: Fetch price for symbol", "symbol", sym.Nemo)
 		case <-c.Ctx.Done():
 			c.Logger.Info("Stopping ticker for symbol", "symbol", sym.Nemo)
@@ -71,9 +69,9 @@ func (c *Collector) startTickerForSymbol(sym domain.Symbol) {
 	}
 }
 
-func (c *Collector) processSymbol() {
-	for sym := range c.Buffer {
-		c.Logger.Debug("Received symbol from buffer", "symbol", sym.Nemo)
+func (c *Collector) startSymbolWorker(buffer <-chan domain.Symbol) {
+	for sym := range buffer {
+		c.Logger.Debug("SymbolWorker - Received Tick", "symbol", sym.Nemo)
 		var price *shared_domain.Price
 		var err error
 

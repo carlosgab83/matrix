@@ -3,6 +3,8 @@ package ingestion
 import (
 	"context"
 	"fmt"
+	"io"
+	"sync"
 
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 	proto "github.com/carlosgab83/matrix/go/internal/shared/proto/matrix.proto"
@@ -14,6 +16,8 @@ import (
 type GRPCPriceIngestor struct {
 	client proto.PriceIngestorClient
 	conn   *grpc.ClientConn
+	stream proto.PriceIngestor_IngestPriceClient
+	mutex  sync.Mutex
 }
 
 // NewGRPCPriceIngestor creates a new gRPC adapter
@@ -28,11 +32,15 @@ func NewGRPCPriceIngestor(address string) (Ingestor, error) {
 	return &GRPCPriceIngestor{
 		client: client,
 		conn:   conn,
+		stream: nil,
 	}, nil
 }
 
 // IngestPrice implements the PriceIngestor interface
 func (g *GRPCPriceIngestor) IngestPrice(ctx context.Context, price *shared_domain.Price) error {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
 	// Convert domain.Price to proto.PriceMessage
 	priceMsg := &proto.PriceMessage{
 		Symbol:    price.Symbol,
@@ -41,14 +49,19 @@ func (g *GRPCPriceIngestor) IngestPrice(ctx context.Context, price *shared_domai
 		Timestamp: price.Timestamp.Unix(),
 	}
 
-	// Make the gRPC call
-	response, err := g.client.IngestPrice(ctx, priceMsg)
-	if err != nil {
-		return fmt.Errorf("failed to ingest price via gRPC: %w", err)
+	if g.stream == nil {
+		stream, err := g.client.IngestPrice(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to create gRPC stream: %w", err)
+		}
+
+		g.stream = stream
 	}
 
-	if !response.Success {
-		return fmt.Errorf("gRPC ingest failed: %s", response.Message)
+	// Make the gRPC call
+	if err := g.stream.Send(priceMsg); err != nil {
+		g.stream = nil
+		return fmt.Errorf("gRPC ingest failed: %w", err)
 	}
 
 	return nil
@@ -56,8 +69,25 @@ func (g *GRPCPriceIngestor) IngestPrice(ctx context.Context, price *shared_domai
 
 // Close closes the gRPC connection
 func (g *GRPCPriceIngestor) Close() error {
-	if g.conn != nil {
-		return g.conn.Close()
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
+	var streamErr, connErr error
+
+	if g.stream != nil {
+		_, err := g.stream.CloseAndRecv()
+		if err != nil && err != io.EOF {
+			streamErr = fmt.Errorf("failed to close gRPC stream: %w", err)
+		}
 	}
-	return nil
+
+	if g.conn != nil {
+		connErr = g.conn.Close()
+	}
+
+	if streamErr != nil {
+		return streamErr
+	}
+
+	return connErr
 }
