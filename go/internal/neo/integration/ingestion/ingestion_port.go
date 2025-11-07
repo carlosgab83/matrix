@@ -9,7 +9,7 @@ import (
 
 // Ingestor defines the interface for ingesting prices
 type Ingestor interface {
-	IngestPrice(ctx context.Context, price *shared_domain.Price) error
+	IngestPrice(context.Context, *shared_domain.Price) error
 	Close() error
 }
 

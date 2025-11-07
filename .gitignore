@@ -34,10 +34,3 @@ go.work.sum
 # Recipe files (development notes)
 RECIPE*
 **/RECIPE*
-
-# Log files and directories
-*.log
-log/
-**/log/
-logs/
-**/logs/

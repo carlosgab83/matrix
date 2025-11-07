@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PriceIngestorClient interface {
-	IngestPrice(ctx context.Context, in *PriceMessage, opts ...grpc.CallOption) (*IngestResponse, error)
+	IngestPrice(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[PriceMessage, IngestResponse], error)
 }
 
 type priceIngestorClient struct {
@@ -37,21 +37,24 @@ func NewPriceIngestorClient(cc grpc.ClientConnInterface) PriceIngestorClient {
 	return &priceIngestorClient{cc}
 }
 
-func (c *priceIngestorClient) IngestPrice(ctx context.Context, in *PriceMessage, opts ...grpc.CallOption) (*IngestResponse, error) {
+func (c *priceIngestorClient) IngestPrice(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[PriceMessage, IngestResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IngestResponse)
-	err := c.cc.Invoke(ctx, PriceIngestor_IngestPrice_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &PriceIngestor_ServiceDesc.Streams[0], PriceIngestor_IngestPrice_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[PriceMessage, IngestResponse]{ClientStream: stream}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PriceIngestor_IngestPriceClient = grpc.ClientStreamingClient[PriceMessage, IngestResponse]
 
 // PriceIngestorServer is the server API for PriceIngestor service.
 // All implementations must embed UnimplementedPriceIngestorServer
 // for forward compatibility.
 type PriceIngestorServer interface {
-	IngestPrice(context.Context, *PriceMessage) (*IngestResponse, error)
+	IngestPrice(grpc.ClientStreamingServer[PriceMessage, IngestResponse]) error
 	mustEmbedUnimplementedPriceIngestorServer()
 }
 
@@ -62,8 +65,8 @@ type PriceIngestorServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPriceIngestorServer struct{}
 
-func (UnimplementedPriceIngestorServer) IngestPrice(context.Context, *PriceMessage) (*IngestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IngestPrice not implemented")
+func (UnimplementedPriceIngestorServer) IngestPrice(grpc.ClientStreamingServer[PriceMessage, IngestResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method IngestPrice not implemented")
 }
 func (UnimplementedPriceIngestorServer) mustEmbedUnimplementedPriceIngestorServer() {}
 func (UnimplementedPriceIngestorServer) testEmbeddedByValue()                       {}
@@ -86,23 +89,12 @@ func RegisterPriceIngestorServer(s grpc.ServiceRegistrar, srv PriceIngestorServe
 	s.RegisterService(&PriceIngestor_ServiceDesc, srv)
 }
 
-func _PriceIngestor_IngestPrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PriceMessage)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PriceIngestorServer).IngestPrice(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PriceIngestor_IngestPrice_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PriceIngestorServer).IngestPrice(ctx, req.(*PriceMessage))
-	}
-	return interceptor(ctx, in, info, handler)
+func _PriceIngestor_IngestPrice_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(PriceIngestorServer).IngestPrice(&grpc.GenericServerStream[PriceMessage, IngestResponse]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PriceIngestor_IngestPriceServer = grpc.ClientStreamingServer[PriceMessage, IngestResponse]
 
 // PriceIngestor_ServiceDesc is the grpc.ServiceDesc for PriceIngestor service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -110,12 +102,13 @@ func _PriceIngestor_IngestPrice_Handler(srv interface{}, ctx context.Context, de
 var PriceIngestor_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.PriceIngestor",
 	HandlerType: (*PriceIngestorServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "IngestPrice",
-			Handler:    _PriceIngestor_IngestPrice_Handler,
+			StreamName:    "IngestPrice",
+			Handler:       _PriceIngestor_IngestPrice_Handler,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "ingest_price.proto",
 }
