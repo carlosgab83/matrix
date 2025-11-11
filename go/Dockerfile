@@ -20,11 +20,12 @@
 # Base image with Go 1.24.5
 FROM golang:1.24.5
 
-# Install protoc and gRPC plugins
+# Install protoc, gRPC plugins, and Mockery
 RUN apt-get update && apt-get install -y \
     protobuf-compiler \
     && go install google.golang.org/protobuf/cmd/protoc-gen-go@latest \
-    && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+    && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest \
+    && go install github.com/vektra/mockery/v2@latest
 
 # Set working directory
 WORKDIR /app
@@ -34,6 +35,9 @@ COPY go.mod go.sum ./
 
 # Download dependencies (caches this layer)
 RUN go mod download
+
+RUN go get github.com/stretchr/testify/assert@v1.11.1 && \
+    go get github.com/stretchr/testify/mock@v1.11.1
 
 # Copy the rest of the source code
 COPY . .
