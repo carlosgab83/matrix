@@ -76,7 +76,7 @@ func (sf *ETHUSDFetcher) ETHUSDFetch(ctx context.Context) (*shared_domain.Price,
 		Symbol:    "ETHUSD",
 		Price:     price,
 		Currency:  "USD",
-		Timestamp: time.Now(),
+		Timestamp: time.Now().UTC(),
 	}
 
 	return priceObj, nil

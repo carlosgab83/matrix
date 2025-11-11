@@ -53,7 +53,7 @@ func (sf *BTCUSDFetcher) BTCUSDFetch(ctx context.Context) (*shared_domain.Price,
 		Symbol:    "BTCUSD",
 		Price:     price,
 		Currency:  "USD",
-		Timestamp: time.Now(),
+		Timestamp: time.Now().UTC(),
 	}
 
 	return priceObj, nil

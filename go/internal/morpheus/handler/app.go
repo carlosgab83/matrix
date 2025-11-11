@@ -10,19 +10,20 @@ import (
 
 	"github.com/carlosgab83/matrix/go/internal/morpheus/domain"
 	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/ingestion"
+	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/persisence"
 	"github.com/carlosgab83/matrix/go/internal/morpheus/service"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/configuration"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 	matrix_proto "github.com/carlosgab83/matrix/go/internal/shared/proto/matrix.proto"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
-	// Driver PostgreSQL
-	// _ "github.com/lib/pq"
 )
 
 type App struct {
-	Name   string
-	Config domain.Config
-	Logger logging.Logger
+	Name            string
+	Config          domain.Config
+	Logger          logging.Logger
+	PriceRepository persisence.PriceRepository
 }
 
 const (
@@ -43,12 +44,19 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
+	priceRepository, err := persisence.NewPriceRepository(cfg.DatabaseConnectionString)
+	if err != nil {
+		log.Fatalf("Error creating repository: %v\n", err)
+		return nil, err
+	}
+
 	logger.Info("Application started", "app", AppName)
 
 	return &App{
-		Name:   AppName,
-		Config: cfg,
-		Logger: logger,
+		Name:            AppName,
+		Config:          cfg,
+		Logger:          logger,
+		PriceRepository: priceRepository,
 	}, nil
 }
 
@@ -59,10 +67,10 @@ func (app *App) Run() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// Create the domain service (inject dependencies via constructor)
-	ingestorService := service.NewIngestorService(ctx, app.Logger)
+	ingestorService := service.NewIngestorService(ctx, app.Logger, app.PriceRepository)
 
 	// Create the gRPC server adapter (inject domain service)
-	grpcServerAdapter := ingestion.NewGRPCPriceIngestorServer(ingestorService, app.Logger)
+	grpcServerAdapter := ingestion.NewGRPCPriceIngestorServer(ctx, ingestorService, app.Logger)
 
 	// Set up gRPC infrastructure
 	listener, err := net.Listen("tcp", app.Config.IngestorAddress)
@@ -88,4 +96,5 @@ func (app *App) Run() {
 	grpcServer.GracefulStop()
 	app.Logger.Info("Application stopped")
 	app.Logger.Close()
+	app.PriceRepository.Close()
 }
