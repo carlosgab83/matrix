@@ -137,7 +137,7 @@ graph LR
    # Currently available for testing:
 
    # Neo & Morpheus (Price collector) - Works with Docker
-   cd go && docker run --rm -it -v $(pwd):/app -w /app neo:latest bash cmd/nm.bash
+   cd go && docker run --rm -it -v $(pwd):/app -w /app matrix:latest bash cmd/nm.bash
 
    # Other services coming soon...
    ```

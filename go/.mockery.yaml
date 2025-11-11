@@ -1,0 +1,17 @@
+# Configuración de Mockery - Todos los mocks centralizados en shared/mocks
+all: true
+with-expecter: true
+dir: "internal"
+output: "internal/shared/mocks"
+outpkg: mocks
+recursive: true
+exported: true
+
+# Excluir directorios
+exclude:
+  - vendor
+  - testdata
+  - mocks
+  - proto
+  - ".*_test.go"
+  - ".*\\.pb\\.go"

@@ -1,4 +1,4 @@
-package symbol
+package symbol_fetch
 
 import (
 	"context"
@@ -15,8 +15,11 @@ type BitstampResponse struct {
 	Last string `json:"last"`
 }
 
-// FetchBTCUSDPrice fetches the current BTC/USD price from Bitstamp
-func FetchBTCUSDPrice(ctx context.Context) (*shared_domain.Price, error) {
+type BTCUSDFetcher struct {
+}
+
+// BTCUSDFetch fetches the current BTC/USD price from Bitstamp
+func (sf *BTCUSDFetcher) BTCUSDFetch(ctx context.Context) (*shared_domain.Price, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://www.bitstamp.net/api/ticker/", nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)

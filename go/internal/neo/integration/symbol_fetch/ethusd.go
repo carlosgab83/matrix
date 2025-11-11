@@ -1,4 +1,4 @@
-package symbol
+package symbol_fetch
 
 import (
 	"context"
@@ -21,8 +21,11 @@ type KrakenPairData struct {
 	A []string `json:"a"` // Ask array: [price, whole_lot_volume, lot_volume]
 }
 
-// FetchETHUSDPrice fetches the current ETH/USD price from Kraken
-func FetchETHUSDPrice(ctx context.Context) (*shared_domain.Price, error) {
+type ETHUSDFetcher struct {
+}
+
+// ETHUSDFetch fetches the current ETH/USD price from Kraken
+func (sf *ETHUSDFetcher) ETHUSDFetch(ctx context.Context) (*shared_domain.Price, error) {
 	// Create request with context for timeout/cancellation
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.kraken.com/0/public/Ticker?pair=ETHUSD", nil)
 	if err != nil {
