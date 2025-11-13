@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 
 	mock "github.com/stretchr/testify/mock"
@@ -21,17 +23,17 @@ func (_m *IngestorServiceInterface) EXPECT() *IngestorServiceInterface_Expecter 
 	return &IngestorServiceInterface_Expecter{mock: &_m.Mock}
 }
 
-// IngestPrice provides a mock function with given fields: price
-func (_m *IngestorServiceInterface) IngestPrice(price *domain.Price) error {
-	ret := _m.Called(price)
+// IngestPrice provides a mock function with given fields: _a0, _a1
+func (_m *IngestorServiceInterface) IngestPrice(_a0 context.Context, _a1 *domain.Price) error {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for IngestPrice")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*domain.Price) error); ok {
-		r0 = rf(price)
+	if rf, ok := ret.Get(0).(func(context.Context, *domain.Price) error); ok {
+		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -45,14 +47,15 @@ type IngestorServiceInterface_IngestPrice_Call struct {
 }
 
 // IngestPrice is a helper method to define mock.On call
-//   - price *domain.Price
-func (_e *IngestorServiceInterface_Expecter) IngestPrice(price interface{}) *IngestorServiceInterface_IngestPrice_Call {
-	return &IngestorServiceInterface_IngestPrice_Call{Call: _e.mock.On("IngestPrice", price)}
+//   - _a0 context.Context
+//   - _a1 *domain.Price
+func (_e *IngestorServiceInterface_Expecter) IngestPrice(_a0 interface{}, _a1 interface{}) *IngestorServiceInterface_IngestPrice_Call {
+	return &IngestorServiceInterface_IngestPrice_Call{Call: _e.mock.On("IngestPrice", _a0, _a1)}
 }
 
-func (_c *IngestorServiceInterface_IngestPrice_Call) Run(run func(price *domain.Price)) *IngestorServiceInterface_IngestPrice_Call {
+func (_c *IngestorServiceInterface_IngestPrice_Call) Run(run func(_a0 context.Context, _a1 *domain.Price)) *IngestorServiceInterface_IngestPrice_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*domain.Price))
+		run(args[0].(context.Context), args[1].(*domain.Price))
 	})
 	return _c
 }
@@ -62,7 +65,7 @@ func (_c *IngestorServiceInterface_IngestPrice_Call) Return(_a0 error) *Ingestor
 	return _c
 }
 
-func (_c *IngestorServiceInterface_IngestPrice_Call) RunAndReturn(run func(*domain.Price) error) *IngestorServiceInterface_IngestPrice_Call {
+func (_c *IngestorServiceInterface_IngestPrice_Call) RunAndReturn(run func(context.Context, *domain.Price) error) *IngestorServiceInterface_IngestPrice_Call {
 	_c.Call.Return(run)
 	return _c
 }
