@@ -1,6 +1,7 @@
 package ingestion
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"time"
@@ -14,12 +15,14 @@ type GRPCPriceIngestorServer struct {
 	matrix_proto.UnimplementedPriceIngestorServer
 	IngestorService IngestorServiceInterface
 	Logger          logging.Logger
+	Ctx             context.Context
 }
 
-func NewGRPCPriceIngestorServer(ingestorService IngestorServiceInterface, logger logging.Logger) *GRPCPriceIngestorServer {
+func NewGRPCPriceIngestorServer(ctx context.Context, ingestorService IngestorServiceInterface, logger logging.Logger) *GRPCPriceIngestorServer {
 	return &GRPCPriceIngestorServer{
 		IngestorService: ingestorService,
 		Logger:          logger,
+		Ctx:             ctx,
 	}
 }
 
@@ -47,7 +50,7 @@ func (s *GRPCPriceIngestorServer) IngestPrice(stream matrix_proto.PriceIngestor_
 		}
 
 		// Call the domain service
-		err = s.IngestorService.IngestPrice(price)
+		err = s.IngestorService.IngestPrice(s.Ctx, price)
 		if err != nil {
 			err = fmt.Errorf("ingesting price %v error: %w", price, err)
 			s.Logger.Error("error ingesting price", "error", err)

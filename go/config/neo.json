@@ -1,7 +1,7 @@
 {
   "log_level": "info",
   "log_file_path": "",
-  "ingestor_address": "localhost:50051",
+  "ingestor_address": "0.0.0.0:50051",
   "default_fetch_interval_seconds": 5,
   "workers_count": 2,
   "symbols": [

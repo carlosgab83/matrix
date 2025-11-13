@@ -1,9 +1,11 @@
 package ingestion
 
 import (
+	"context"
+
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 )
 
 type IngestorServiceInterface interface {
-	IngestPrice(price *shared_domain.Price) error
+	IngestPrice(context.Context, *shared_domain.Price) error
 }

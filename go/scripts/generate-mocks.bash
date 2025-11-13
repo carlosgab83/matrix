@@ -22,15 +22,15 @@ rm -rf "$MOCKS_DIR"
 mkdir -p "$MOCKS_DIR"
 echo ""
 
-# Generate mocks with Docker (using our matrix:latest image)
-echo "📦 Running Mockery in matrix:latest container..."
+# Generate mocks with Docker (using our matrix-go-dev:latest image)
+echo "📦 Running Mockery in matrix-go-dev:latest container..."
 echo "🔍 Scanning internal/ for interfaces..."
 echo ""
 
 docker run --rm \
     -v "$PWD":/app \
     -w /app \
-    matrix:latest \
+    matrix-go-dev:latest \
     mockery --config .mockery.yaml
 
 # If you have mockery installed locally, comment the line above and use:

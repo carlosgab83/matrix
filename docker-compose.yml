@@ -1,0 +1,105 @@
+version: "3.2"
+
+services:
+  # ======================================================
+  # TimescaleDB + PostgreSQL
+  # ======================================================
+  timescaledb:
+    image: timescale/timescaledb:latest-pg17
+    container_name: timescaledb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: matrix_development
+    ports:
+      - "55432:5432"
+    volumes:
+      - ./docker_data/timescale:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d matrix_development"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - matrix-network
+
+  # ======================================================
+  # Neo - Price Collector Service (gRPC Client)
+  # ======================================================
+  neo:
+    build:
+      context: ./go
+      dockerfile: Dockerfile
+    image: matrix-go-dev:latest
+    container_name: neo
+    environment:
+      MATRIX_NEO_INGESTOR_ADDRESS: morpheus:50051
+    volumes:
+      - ./go:/app
+    working_dir: /app
+    command: go run ./cmd/neo/main.go
+    restart: unless-stopped
+    networks:
+      - matrix-network
+
+  # ======================================================
+  # Morpheus - Data Hub Service (gRPC Server)
+  # ======================================================
+  morpheus:
+    build:
+      context: ./go
+      dockerfile: Dockerfile
+    image: matrix-go-dev:latest
+    container_name: morpheus
+    depends_on:
+      - timescaledb
+    environment:
+      DATABASE_URL: postgres://postgres:admin@timescaledb:5432/matrix_development?sslmode=disable
+      MATRIX_MORPHEUS_INGESTOR_ADDRESS: morpheus:50051
+    volumes:
+      - ./go:/app
+    working_dir: /app
+    command: go run ./cmd/morpheus/main.go
+    ports:
+      - "50051:50051"
+    restart: unless-stopped
+    networks:
+      - matrix-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "50051"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ======================================================
+  # Trinity - News Collector (Future)
+  # ======================================================
+  # trinity:
+  #   build:
+  #     context: ./go
+  #     dockerfile: Dockerfile
+  #     target: dev
+  #   image: matrix-go-dev:latest
+  #   container_name: trinity
+  #   depends_on:
+  #     morpheus:
+  #       condition: service_healthy
+  #   environment:
+  #     MATRIX_TRINITY_INGESTOR_ADDRESS: morpheus:50051
+  #     MATRIX_LOG_LEVEL: debug
+  #     MATRIX_LOG_FORMAT: json
+  #   volumes:
+  #     - ./go:/app
+  #   working_dir: /app
+  #   command: go run ./cmd/trinity/main.go
+  #   restart: unless-stopped
+  #   networks:
+  #     - matrix-network
+
+networks:
+  matrix-network:
+    driver: bridge
+
+volumes:
+  timescale-data:

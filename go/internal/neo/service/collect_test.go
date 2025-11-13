@@ -1,11 +1,11 @@
-package collector_test
+package service_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/carlosgab83/matrix/go/internal/neo/domain"
-	"github.com/carlosgab83/matrix/go/internal/neo/service/collector"
+	"github.com/carlosgab83/matrix/go/internal/neo/service"
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 	"github.com/carlosgab83/matrix/go/internal/shared/mocks"
@@ -50,7 +50,7 @@ func TestNewCollector(t *testing.T) {
 	logger, _ := logging.NewLogger(cfg.CommonConfig)
 
 	// Initilization
-	col := collector.NewCollector(cfg, logger, mockIngestor, mockSymbolFetcher)
+	col := service.NewCollector(cfg, logger, mockIngestor, mockSymbolFetcher)
 
 	// Call
 	go col.Collect()

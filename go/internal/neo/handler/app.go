@@ -9,7 +9,7 @@ import (
 	"github.com/carlosgab83/matrix/go/internal/neo/domain"
 	"github.com/carlosgab83/matrix/go/internal/neo/integration/ingestion"
 	"github.com/carlosgab83/matrix/go/internal/neo/integration/symbol_fetch"
-	"github.com/carlosgab83/matrix/go/internal/neo/service/collector"
+	"github.com/carlosgab83/matrix/go/internal/neo/service"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/configuration"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 )
@@ -65,7 +65,7 @@ func (app *App) Run() {
 
 	symbolFetcher := symbol_fetch.NewSymbolFetcher()
 
-	coll := collector.NewCollector(app.Config, app.Logger, ingestor, symbolFetcher)
+	coll := service.NewCollector(app.Config, app.Logger, ingestor, symbolFetcher)
 	go coll.Collect()
 
 	sig := <-sigChan
