@@ -14,5 +14,5 @@ type Ingestor interface {
 }
 
 func NewIngestor(cfg domain.Config) (Ingestor, error) {
-	return NewGRPCPriceIngestor(cfg.IngestorAddress)
+	return NewGRPCPriceIngestor(cfg.IngestorAddress, cfg.GRPCSharedToken)
 }

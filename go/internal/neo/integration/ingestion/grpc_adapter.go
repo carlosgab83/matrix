@@ -10,18 +10,20 @@ import (
 	proto "github.com/carlosgab83/matrix/go/internal/shared/proto/matrix.proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 // GRPCPriceIngestor implements the PriceIngestor port using gRPC
 type GRPCPriceIngestor struct {
-	client proto.PriceIngestorClient
-	conn   *grpc.ClientConn
-	stream proto.PriceIngestor_IngestPriceClient
-	mutex  sync.Mutex
+	client      proto.PriceIngestorClient
+	conn        *grpc.ClientConn
+	stream      proto.PriceIngestor_IngestPriceClient
+	mutex       sync.Mutex
+	sharedToken string
 }
 
 // NewGRPCPriceIngestor creates a new gRPC adapter
-func NewGRPCPriceIngestor(address string) (Ingestor, error) {
+func NewGRPCPriceIngestor(address string, sharedToken string) (Ingestor, error) {
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to gRPC server: %w", err)
@@ -30,9 +32,10 @@ func NewGRPCPriceIngestor(address string) (Ingestor, error) {
 	client := proto.NewPriceIngestorClient(conn)
 
 	return &GRPCPriceIngestor{
-		client: client,
-		conn:   conn,
-		stream: nil,
+		client:      client,
+		conn:        conn,
+		stream:      nil,
+		sharedToken: sharedToken,
 	}, nil
 }
 
@@ -50,6 +53,12 @@ func (g *GRPCPriceIngestor) IngestPrice(ctx context.Context, price *shared_domai
 	}
 
 	if g.stream == nil {
+		// Add authorization token to context metadata
+		md := metadata.New(map[string]string{
+			"authorization": g.sharedToken,
+		})
+		ctx = metadata.NewOutgoingContext(ctx, md)
+
 		stream, err := g.client.IngestPrice(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to create gRPC stream: %w", err)
