@@ -76,10 +76,13 @@ func (app *App) Run() {
 	listener, err := net.Listen("tcp", app.Config.IngestorAddress)
 	if err != nil {
 		app.Logger.Error("Failed to listen on ingestor address", "address", app.Config.IngestorAddress, "error", err)
+		cancel()
 		return
 	}
 
-	grpcServer := grpc.NewServer()
+	// Create gRPC server with authentication interceptor
+	authInterceptor := ingestion.AuthStreamInterceptor(app.Config.GRPCSharedToken, app.Logger)
+	grpcServer := grpc.NewServer(grpc.StreamInterceptor(authInterceptor))
 	matrix_proto.RegisterPriceIngestorServer(grpcServer, grpcServerAdapter)
 
 	log.Println("gRPC server listening on :50051")

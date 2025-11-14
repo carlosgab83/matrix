@@ -8,6 +8,7 @@ type Config struct {
 	DefaultFetchIntervalSeconds int      `json:"default_fetch_interval_seconds" env:"MATRIX_NEO_DEFAULT_FETCH_INTERVAL_SECONDS"`
 	WorkersCount                int      `json:"workers_count" env:"MATRIX_NEO_WORKERS_COUNT"`
 	Symbols                     []Symbol `json:"symbols"`
+	GRPCSharedToken             string   `json:"grpc_shared_token" env:"MATRIX_NEO_GRPC_SHARED_TOKEN"`
 }
 
 type Symbol struct {
