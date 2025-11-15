@@ -11,6 +11,7 @@ import (
 	"github.com/carlosgab83/matrix/go/internal/morpheus/domain"
 	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/ingestion"
 	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/persisence"
+	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/publication"
 	"github.com/carlosgab83/matrix/go/internal/morpheus/service"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/configuration"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
@@ -66,8 +67,16 @@ func (app *App) Run() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 
+	// Create Publicator
+	publicator, err := publication.NewPublicator(app.Config, app.Logger)
+	if err != nil {
+		app.Logger.Error("Failed to create publicator", "error", err)
+		cancel()
+		return
+	}
+
 	// Create the domain service (inject dependencies via constructor)
-	ingestorService := service.NewIngestorService(ctx, app.Logger, app.PriceRepository)
+	ingestorService := service.NewIngestorService(ctx, app.Logger, app.PriceRepository, publicator)
 
 	// Create the gRPC server adapter (inject domain service)
 	grpcServerAdapter := ingestion.NewGRPCPriceIngestorServer(ctx, ingestorService, app.Logger)
