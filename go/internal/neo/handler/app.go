@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -28,8 +28,7 @@ const (
 func NewApp() (*App, error) {
 	var cfg domain.Config
 	if err := configuration.LoadConfig(&cfg, AppName, ConfigFile); err != nil {
-		log.Fatalf("Error loading config: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error loading config: %v", err)
 	}
 
 	if cfg.WorkersCount <= 0 {
@@ -38,8 +37,7 @@ func NewApp() (*App, error) {
 
 	logger, err := logging.NewLogger(cfg.CommonConfig)
 	if err != nil {
-		log.Fatalf("Error creating logger: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error creating logger: %v", err)
 	}
 
 	logger.Info("Application started", "app", AppName)
