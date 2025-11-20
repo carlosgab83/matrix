@@ -25,6 +25,39 @@ services:
       - matrix-network
 
   # ======================================================
+  # Nabucodonosor - Message Broker (Kafka)
+  # ======================================================
+  nabucodonosor:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: nabucodonosor
+    user: "0:0"
+    environment:
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://nabucodonosor:9092"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@nabucodonosor:9093"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    ports:
+      - "9092:9092"
+    volumes:
+      - ./docker_data/nabucodonosor_data:/var/lib/kafka/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/usr/bin/kafka-broker-api-versions --bootstrap-server nabucodonosor:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - matrix-network
+
+  # ======================================================
   # Neo - Price Collector Service (gRPC Client)
   # ======================================================
   neo:
@@ -55,6 +88,7 @@ services:
     container_name: morpheus
     depends_on:
       - timescaledb
+      - nabucodonosor
     environment:
       DATABASE_URL: postgres://postgres:admin@timescaledb:5432/matrix_development?sslmode=disable
       MATRIX_MORPHEUS_INGESTOR_ADDRESS: morpheus:50051
@@ -99,9 +133,31 @@ services:
   #   networks:
   #     - matrix-network
 
+  # ======================================================
+  # Oracle - Analytics & Alert Engine (Python)
+  # ======================================================
+  oracle:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    image: matrix-python-dev:latest
+    container_name: oracle
+    depends_on:
+      - nabucodonosor
+    environment:
+      PYTHONUNBUFFERED: "1"
+      KAFKA_BOOTSTRAP_SERVERS: nabucodonosor:9092
+      KAFKA_TOPIC: price-updates
+      KAFKA_GROUP_ID: oracle-consumer-group
+      LOG_LEVEL: info
+    volumes:
+      - ./python/oracle:/app
+    working_dir: /app
+    command: python main.py
+    restart: unless-stopped
+    networks:
+      - matrix-network
+
 networks:
   matrix-network:
     driver: bridge
-
-volumes:
-  timescale-data:

@@ -3,5 +3,5 @@
   "log_file_path": "",
   "ingestor_address": "0.0.0.0:50051",
   "database_connection_string": "postgres://postgres:admin@timescaledb:5432/matrix_development?sslmode=disable",
-  "event_bus_id": 1
+  "kafka_listener": "nabucodonosor:9092"
 }

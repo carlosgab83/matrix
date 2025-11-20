@@ -28,12 +28,13 @@ func TestIngestPriceTest(t *testing.T) {
 	// Mocks
 	mockPriceRepository := mocks.NewPriceRepository(t)
 	mockPriceRepository.On("InsertPrice", ctx, price).Return(nil)
+	mockPublicator := mocks.NewPublicator(t)
 
 	// Real
 	logger, _ := logging.NewLogger(cfg.CommonConfig)
 
 	// Initilization
-	ingestorService := service.NewIngestorService(ctx, logger, mockPriceRepository)
+	ingestorService := service.NewIngestorService(ctx, logger, mockPriceRepository, mockPublicator)
 
 	// Call
 	ingestorService.IngestPrice(ctx, &price)

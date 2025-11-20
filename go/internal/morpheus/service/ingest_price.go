@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/persisence"
+	"github.com/carlosgab83/matrix/go/internal/morpheus/integration/publication"
 	shared_domain "github.com/carlosgab83/matrix/go/internal/shared/domain"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 )
@@ -11,13 +12,15 @@ import (
 type IngestorService struct {
 	Logger          logging.Logger
 	PriceRepository persisence.PriceRepository
+	Publicator      publication.Publicator
 	Ctx             context.Context
 }
 
-func NewIngestorService(ctx context.Context, logger logging.Logger, priceRepository persisence.PriceRepository) *IngestorService {
+func NewIngestorService(ctx context.Context, logger logging.Logger, priceRepository persisence.PriceRepository, publicator publication.Publicator) *IngestorService {
 	return &IngestorService{
 		Logger:          logger,
 		PriceRepository: priceRepository,
+		Publicator:      publicator,
 		Ctx:             ctx,
 	}
 }
@@ -46,7 +49,7 @@ func (s *IngestorService) IngestPrice(ctx context.Context, price *shared_domain.
 		"price", price.Price,
 		"currency", price.Currency)
 
-	// TODO: Notify Orcale
+	s.Publicator.NewDBPrice(s.Ctx, *price)
 
 	return nil
 }

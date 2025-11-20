@@ -34,3 +34,6 @@ go.work.sum
 # Recipe files (development notes)
 RECIPE*
 **/RECIPE*
+
+docker_data
+__pycache__
