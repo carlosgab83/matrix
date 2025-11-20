@@ -16,7 +16,7 @@ type KafkaPublicator struct {
 }
 
 func NewKafkaPublicator(cfg domain.Config, logger logging.Logger) (*KafkaPublicator, error) {
-	brokers := []string{cfg.KafKaListener}
+	brokers := []string{cfg.KafKaConsumerAddress}
 
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
