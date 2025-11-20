@@ -13,12 +13,12 @@
     {
       "nemo": "ETHUSD",
       "name": "ETH-USD",
-      "fetch_interval_seconds": 5
+      "fetch_interval_seconds": 500
     },
     {
       "nemo": "ETHUSD2",
       "name": "ETH-USD",
-      "fetch_interval_seconds": 15
+      "fetch_interval_seconds": 1500
     }
   ]
 }
