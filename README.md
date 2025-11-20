@@ -2,7 +2,7 @@
 
 A comprehensive financial data processing and alerting system built with microservices architecture following clean design principles.
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 Matrix is composed of five specialized microservices that work together to collect, process, analyze, and alert on financial market data:
 
@@ -30,7 +30,7 @@ graph LR
     class H external
 ```
 
-## 🚀 Services
+## Services
 
 ### 🟢 Neo - Stock Price Collector
 **Purpose**: Collects real-time stock market prices and sends them to Morpheus via gRPC
@@ -108,7 +108,7 @@ graph LR
 
 **Tech Stack**: To Be defined, Kafka, Various notification APIs
 
-## 🛠️ Development Setup
+## Development Setup
 
 > ⚠️ **Work in Progress**: The automated setup, build scripts, and some services are currently under development.
 
@@ -119,12 +119,12 @@ graph LR
 
 ### Getting Started
 
-> 🚧 **Note**: Complete setup instructions will be available soon. Current implementation status:
-> - ✅ Neo (Price collector) - Basic implementation available
-> - 🚧 Morpheus (Data hub) - Under development
-> - ✅ Trinity (News collector) - Planned
-> - ⏳ Oracle (Analytics) - Planned
-> - ⏳ Tank (Notifications) - Planned
+> **Note**: Complete setup instructions will be available soon. Current implementation status:
+> - Neo (Price collector) - Basic implementation available
+> - Morpheus (Data hub) - Under development
+> - Trinity (News collector) - Planned
+> - Oracle (Analytics) - Under development
+> - Tank (Notifications) - Under development
 
 1. **Clone the repository**
    ```bash
@@ -136,13 +136,12 @@ graph LR
    ```bash
    # Currently available for testing:
 
-   # Neo & Morpheus (Price collector) - Works with Docker
-   cd go && docker run --rm -it -v $(pwd):/app -w /app matrix:latest bash cmd/nm.bash
+   docker-compose up
 
    # Other services coming soon...
    ```
 
-## 🏛️ Architecture Principles
+## Architecture Principles
 
 ### Communication Patterns
 - **Synchronous**: gRPC for real-time data ingestion (Neo/Trinity → Morpheus)
@@ -155,7 +154,7 @@ graph LR
 - Distributed tracing for request flows
 - Health checks and readiness probes
 
-## � Data Flow
+## Data Flow
 
 1. **Collection**: Neo collects stock prices, Trinity collects news
 2. **Ingestion**: Both services send data to Morpheus via gRPC
@@ -164,23 +163,23 @@ graph LR
 5. **Alerting**: Oracle generates alerts and sends notification requests to Kafka
 6. **Delivery**: Tank consumes notification requests and delivers through appropriate channels
 
-## 🚦 Status
+## Status
 
 This project is currently under active development
 
-## 📝 License
+## License
 
 This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License - see the [LICENSE](LICENSE) file for details.
 
 ### CC BY-NC 4.0 License
 
 **You are free to:**
-- ✅ **Share** — copy and redistribute the material in any medium or format
-- ✅ **Adapt** — remix, transform, and build upon the material for non-commercial purposes
+- **Share** — copy and redistribute the material in any medium or format
+- **Adapt** — remix, transform, and build upon the material for non-commercial purposes
 
 **Under the following terms:**
-- 📝 **Attribution** — You must give appropriate credit and indicate if changes were made
-- 🚫 **NonCommercial** — You may not use the material for commercial purposes
+- **Attribution** — You must give appropriate credit and indicate if changes were made
+- **NonCommercial** — You may not use the material for commercial purposes
 
 This is a learning project and is intended for educational and personal use only. Commercial use requires explicit permission from the author.
 

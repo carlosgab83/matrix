@@ -24,11 +24,9 @@ def run():
   consumer.subscribe(["price.db.new"])
 
   print("Listening for messages on 'price.db.new'...")
-
   try:
     while True:
       msg = consumer.poll(1.0)
-
       if msg is None:
         continue
 
@@ -41,6 +39,7 @@ def run():
 
   except KeyboardInterrupt:
     print("\n Stopping consumer...")
+
   finally:
     consumer.close()
 
@@ -50,12 +49,10 @@ def process_message(price):
   price_value = price["price"]
   currency = price["currency"]
   timestamp = price["timestamp"]
-
   print(f"Processing {symbol} {price_value} {currency} at {timestamp}")
-  # Notify if int(price_value) is even (Testing purposes)
   try:
     price_int = int(price_value)
-    if price_int % 2 == 0:
+    if price_int % 2 == 0: # Notify if int(price_value) is even (Testing purposes)
       print(f"Notifying tank: {symbol} price {price_int} is even.")
       payload = {
           "type": "new_price",
