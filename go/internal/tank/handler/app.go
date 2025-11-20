@@ -10,6 +10,9 @@ import (
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/configuration"
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 	"github.com/carlosgab83/matrix/go/internal/tank/domain"
+	"github.com/carlosgab83/matrix/go/internal/tank/integration/notification"
+	"github.com/carlosgab83/matrix/go/internal/tank/integration/reception"
+	"github.com/carlosgab83/matrix/go/internal/tank/service"
 )
 
 type App struct {
@@ -48,10 +51,34 @@ func (app *App) Run() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	app.Logger.Info("Listening Kafka...")
+	receptor, err := reception.NewReceptor(ctx, app.Config, app.Logger)
+	if err != nil {
+		app.Logger.Error("Failed to create receptor", "error", err)
+		return
+	}
+
+	notifier, err := notification.NewNotifier(app.Config, app.Logger)
+	if err != nil {
+		app.Logger.Error("Failed to create notifier", "error", err)
+		return
+	}
+
+	notifierService, err := service.NewNotifierService(app.Config, receptor, notifier, app.Logger)
+	if err != nil {
+		app.Logger.Error("Failed to create notifierService", "error", err)
+		return
+	}
+
+	go func() {
+		if err = notifierService.ListenAndNotify(ctx); err != nil {
+			app.Logger.Error("Failed to ListenAndNotify", "error", err)
+			return
+		}
+	}()
 
 	<-ctx.Done()
-	// TODO: Disconnect Kafka, repository and other services
+	receptor.Close()
+	notifier.Close()
 	app.Logger.Info("Context cancelled, shutting down gracefully", "context", ctx.Err())
 	app.Logger.Info("Application stopped")
 	app.Logger.Close()

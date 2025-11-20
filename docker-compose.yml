@@ -145,6 +145,8 @@ services:
     depends_on:
       - timescaledb
       - nabucodonosor
+    environment:
+      MATRIX_TANK_TELEGRAM_BOT_API_TOKEN: ${MATRIX_TANK_TELEGRAM_BOT_API_TOKEN}
     volumes:
       - ./go:/app
     working_dir: /app

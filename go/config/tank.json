@@ -2,5 +2,6 @@
   "log_level": "info",
   "log_file_path": "",
   "database_connection_string": "postgres://postgres:admin@timescaledb:5432/matrix_development?sslmode=disable",
-  "kafka_producer_address": "nabucodonosor:9092"
+  "kafka_producer_address": "nabucodonosor:9092",
+  "notifier_write_timeout": "10000"
 }
