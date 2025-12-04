@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -35,20 +36,17 @@ const (
 func NewApp() (*App, error) {
 	var cfg domain.Config
 	if err := configuration.LoadConfig(&cfg, AppName, ConfigFile); err != nil {
-		log.Fatalf("Error loading config: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error loading config: %v", err)
 	}
 
 	logger, err := logging.NewLogger(cfg.CommonConfig)
 	if err != nil {
-		log.Fatalf("Error creating logger: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error creating logger: %v", err)
 	}
 
 	priceRepository, err := persisence.NewPriceRepository(cfg.DatabaseConnectionString)
 	if err != nil {
-		log.Fatalf("Error creating repository: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error creating repository: %v", err)
 	}
 
 	logger.Info("Application started", "app", AppName)
@@ -66,6 +64,7 @@ func (app *App) Run() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// Create Publicator
 	publicator, err := publication.NewPublicator(app.Config, app.Logger)
@@ -104,7 +103,6 @@ func (app *App) Run() {
 
 	sig := <-sigChan
 	app.Logger.Info("Received signal, shutting down gracefully", "signal", sig)
-	cancel()
 	grpcServer.GracefulStop()
 	app.Logger.Info("Application stopped")
 	app.Logger.Close()

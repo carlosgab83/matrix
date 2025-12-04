@@ -76,6 +76,7 @@ services:
     restart: unless-stopped
     networks:
       - matrix-network
+    # TODO: Add healthcheck for Neo (in production)
 
   # ======================================================
   # Morpheus - Data Hub Service (gRPC Server)
@@ -90,7 +91,6 @@ services:
       - timescaledb
       - nabucodonosor
     environment:
-      DATABASE_URL: postgres://postgres:admin@timescaledb:5432/matrix_development?sslmode=disable
       MATRIX_MORPHEUS_INGESTOR_ADDRESS: morpheus:50051
       MATRIX_MORPHEUS_GRPC_SHARED_TOKEN: ${GRPC_SHARED_TOKEN:-matrix-secret-token-2024}
     volumes:
@@ -134,6 +134,29 @@ services:
   #     - matrix-network
 
   # ======================================================
+  # Tank - User Notifier
+  # ======================================================
+  tank:
+    build:
+      context: ./go
+      dockerfile: Dockerfile
+    image: matrix-go-dev:latest
+    container_name: tank
+    depends_on:
+      - timescaledb
+      - nabucodonosor
+    environment:
+      MATRIX_TANK_TELEGRAM_BOT_API_TOKEN: ${MATRIX_TANK_TELEGRAM_BOT_API_TOKEN}
+    volumes:
+      - ./go:/app
+    working_dir: /app
+    command: go run ./cmd/tank/main.go
+    restart: unless-stopped
+    networks:
+      - matrix-network
+    # TODO: Add healthcheck for Tank (in production)
+
+  # ======================================================
   # Oracle - Analytics & Alert Engine (Python)
   # ======================================================
   oracle:
@@ -143,6 +166,7 @@ services:
     image: matrix-python-dev:latest
     container_name: oracle
     depends_on:
+      - timescaledb
       - nabucodonosor
     environment:
       PYTHONUNBUFFERED: "1"
@@ -157,6 +181,7 @@ services:
     restart: unless-stopped
     networks:
       - matrix-network
+    # TODO: Add healthcheck for Oracle (in production)
 
 networks:
   matrix-network:

@@ -23,6 +23,11 @@ def run():
   consumer = Consumer(config)
   consumer.subscribe(["price.db.new"])
 
+  # Testing Purposes: (sending direct to Tank) REMOVE SOON
+  # msg = {"type": "new_price", "symbol": "BTCUSD", "price": 87760, "currency": "USD", "timestamp": "2025-11-20T22:13:18Z"}
+  # process_message(msg)
+  # consumer.close()
+
   print("Listening for messages on 'price.db.new'...")
   try:
     while True:
@@ -57,7 +62,7 @@ def process_message(price):
       payload = {
           "type": "new_price",
           "symbol": symbol,
-          "price": price,
+          "price": price_value,
           "currency": currency,
           "timestamp": timestamp
       }
