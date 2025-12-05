@@ -4,7 +4,7 @@
 require 'sorbet-runtime'
 require 'architect/domain/condition'
 require 'architect/domain/action'
-require 'architect/domain/rule'
+require "architect/domain/rule"
 
 module Architect
   module Domain
@@ -14,7 +14,7 @@ module Architect
       sig { returns(String) }
       attr_reader :name
 
-      sig { params(name: String).void}
+      sig { params(name: String).void }
       def initialize(name)
         @name = T.let(name, String)
         @conditions = T.let([], T::Array[Condition])
@@ -23,22 +23,22 @@ module Architect
         @exclusion = T.let([], T::Array[String])
       end
 
-      sig { params(type: T.any(String, Symbol)).void}
+      sig { params(type: T.any(String, Symbol)).void }
       def for_type(type)
         @conditions << Condition.new(key: type.to_s, operator: :equals_to, value: type.to_s)
       end
 
-      sig { params(key: T.any(String, Symbol), operator: T.any(String, Symbol), value: T.untyped).void}
+      sig { params(key: T.any(String, Symbol), operator: T.any(String, Symbol), value: T.untyped).void }
       def condition(key, operator, value)
         @conditions << Condition.new(key: key.to_s, operator: operator.to_sym, value: value)
       end
 
-      sig { params(stock_symbol: T.any(String, T::Array[String])).void}
+      sig { params(stock_symbol: T.any(String, T::Array[String])).void }
       def only(stock_symbol)
         @inclusion = stock_symbol.is_a?(Array) ? stock_symbol : [stock_symbol]
       end
 
-      sig { params(stock_symbol: T.any(String, T::Array[String])).void}
+      sig { params(stock_symbol: T.any(String, T::Array[String])).void }
       def except(stock_symbol)
         @exclusion = stock_symbol.is_a?(Array) ? stock_symbol : [stock_symbol]
       end

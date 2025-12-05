@@ -24,7 +24,10 @@ module Architect
       sig { returns(T::Array[String]) }
       attr_reader :exclusion
 
-      sig { params(name: String, conditions: T::Array[Condition], actions: T::Array[Action], inclusion: T::Array[String], exclusion: T::Array[String]).void }
+      sig do
+        params(name: String, conditions: T::Array[Condition], actions: T::Array[Action], inclusion: T::Array[String],
+               exclusion: T::Array[String]).void
+      end
       def initialize(name:, conditions:, actions:, inclusion: [], exclusion: [])
         @name = T.let(name, String)
         @conditions = T.let(conditions, T::Array[Condition])
@@ -38,7 +41,7 @@ module Architect
 
       sig { void }
       def validate_exclusive_options!
-        return if (inclusion).empty? || (exclusion).empty?
+        return if inclusion.empty? || exclusion.empty?
 
         raise Architect::Domain::Errors::InvalidRuleDefinition,
               'exclusion and inclusion are mutually exclusive options'

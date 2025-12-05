@@ -12,14 +12,12 @@ module Architect
 
         sig { returns(T::Hash[String, T::Boolean]) }
         def unique_validator
-          @unique_validator = T.let(@unique_validator, T.nilable(T::Hash[String, T::Boolean]))
-          @unique_validator ||= {}
+          @unique_validator ||= T.let({}, T.nilable(T::Hash[String, T::Boolean]))
         end
 
         sig { returns(T::Array[Rule]) }
         def rules
-          @rules = T.let(@rules, T.nilable(T::Array[Rule]))
-          @rules ||= []
+          @rules ||= T.let([], T.nilable(T::Array[Rule]))
         end
 
         sig { params(rule: Rule).void }

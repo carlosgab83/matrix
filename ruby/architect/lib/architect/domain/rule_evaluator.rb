@@ -19,7 +19,7 @@ module Architect
         @rules = T.let(rules, T::Array[Rule])
       end
 
-      sig { params(snapshot: T::Hash[String, T.untyped]).returns(T.any(Rule, NilClass)) }
+      sig { params(snapshot: T::Hash[String, T.untyped]).returns(T.nilable(Rule)) }
       def evaluate(snapshot)
         rules.each do |rule|
           return rule if matches?(rule, snapshot)
