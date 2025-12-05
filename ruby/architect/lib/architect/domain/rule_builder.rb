@@ -4,7 +4,7 @@
 require 'sorbet-runtime'
 require 'architect/domain/condition'
 require 'architect/domain/action'
-require "architect/domain/rule"
+require 'architect/domain/rule'
 
 module Architect
   module Domain
