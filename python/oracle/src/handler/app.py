@@ -24,9 +24,10 @@ def run():
   consumer.subscribe(["price.db.new"])
 
   # Testing Purposes: (sending direct to Tank) REMOVE SOON
-  # msg = {"type": "new_price", "symbol": "BTCUSD", "price": 87760, "currency": "USD", "timestamp": "2025-11-20T22:13:18Z"}
+  # msg = {"type": "test", "symbol": "BTCUSD", "price": 87760, "currency": "USD", "timestamp": "2025-11-20T22:13:18Z"}
   # process_message(msg)
   # consumer.close()
+  # exit(0)
 
   print("Listening for messages on 'price.db.new'...")
   try:
@@ -58,9 +59,9 @@ def process_message(price):
   try:
     price_int = int(price_value)
     if price_int % 2 == 0: # Notify if int(price_value) is even (Testing purposes)
-      print(f"Notifying tank: {symbol} price {price_int} is even.")
+      print(f"Notifying Architect: {symbol} price {price_int} is even.")
       payload = {
-          "type": "new_price",
+          "type": "test",
           "symbol": symbol,
           "price": price_value,
           "currency": currency,
@@ -75,9 +76,9 @@ def process_message(price):
 
 def publicate_message(payload):
   try:
-    producer.produce("notification.new", value=json.dumps(payload).encode("utf-8"))
+    producer.produce("snapshot.new", value=json.dumps(payload).encode("utf-8"))
     producer.flush()
-    print(f"Notification sent to 'notification.new': {json.dumps(payload)}")
+    print(f"Notification sent to 'snapshot.new': {json.dumps(payload)}")
 
   except Exception as e:
     print(f"Error sending notification to Kafka: {e}")
