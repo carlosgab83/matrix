@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require 'sorbet-runtime'
-require "architect/domain/rule_builder"
+require 'architect/domain/rule_builder'
 
 module Architect
   module Domain
