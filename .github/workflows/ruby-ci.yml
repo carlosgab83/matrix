@@ -2,13 +2,11 @@ name: Ruby CI
 
 on:
   push:
-    branches: [ main, develop, add-architect ]
     paths:
       - 'ruby/**'
       - '.rubocop.yml'
       - '.github/workflows/ruby-ci.yml'
   pull_request:
-    branches: [ main, develop ]
     paths:
       - 'ruby/**'
       - '.rubocop.yml'
