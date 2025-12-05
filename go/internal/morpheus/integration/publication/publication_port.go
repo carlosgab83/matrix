@@ -10,11 +10,11 @@ import (
 
 const NewDBPriceTopic string = "price.db.new"
 
-type Publicator interface {
+type Publisher interface {
 	NewDBPrice(context.Context, shared_domain.Price) error
 	Close() error
 }
 
-func NewPublicator(cfg domain.Config, logger logging.Logger) (Publicator, error) {
-	return NewKafkaPublicator(cfg, logger)
+func NewPublisher(cfg domain.Config, logger logging.Logger) (Publisher, error) {
+	return NewKafkaPublisher(cfg, logger)
 }

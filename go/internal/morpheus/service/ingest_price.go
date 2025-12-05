@@ -12,15 +12,15 @@ import (
 type IngestorService struct {
 	Logger          logging.Logger
 	PriceRepository persisence.PriceRepository
-	Publicator      publication.Publicator
+	Publisher       publication.Publisher
 	Ctx             context.Context
 }
 
-func NewIngestorService(ctx context.Context, logger logging.Logger, priceRepository persisence.PriceRepository, publicator publication.Publicator) *IngestorService {
+func NewIngestorService(ctx context.Context, logger logging.Logger, priceRepository persisence.PriceRepository, publisher publication.Publisher) *IngestorService {
 	return &IngestorService{
 		Logger:          logger,
 		PriceRepository: priceRepository,
-		Publicator:      publicator,
+		Publisher:       publisher,
 		Ctx:             ctx,
 	}
 }
@@ -49,7 +49,7 @@ func (s *IngestorService) IngestPrice(ctx context.Context, price *shared_domain.
 		"price", price.Price,
 		"currency", price.Currency)
 
-	s.Publicator.NewDBPrice(s.Ctx, *price)
+	s.Publisher.NewDBPrice(s.Ctx, *price)
 
 	return nil
 }
