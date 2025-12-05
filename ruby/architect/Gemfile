@@ -14,3 +14,8 @@ group :development do
   gem 'sorbet-runtime', '~> 0.6.12812'
   gem 'tapioca', '~> 0.17', require: false
 end
+
+group :test do
+  gem 'minitest-reporters', '1.7.1'
+  gem 'mocha', '2.8.2'
+end
