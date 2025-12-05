@@ -21,7 +21,7 @@ type KafkaReceptor struct {
 
 const (
 	TopicName string = "notification.new"
-	GroupID   string = "price-analyzer"
+	GroupID   string = "notificator"
 )
 
 func NewKafkaReceptor(ctx context.Context, cfg domain.Config, logger logging.Logger) (*KafkaReceptor, error) {
@@ -64,6 +64,7 @@ func (kr *KafkaReceptor) ConsumeClaim(session sarama.ConsumerGroupSession, claim
 		var notificationPayload domain.NotificationPayload
 		if err := json.Unmarshal(message.Value, &notificationPayload); err != nil {
 			kr.Logger.Error("error ConsumeClaim Unmarshaling: %v", err)
+			session.MarkMessage(message, "")
 			return err
 		}
 

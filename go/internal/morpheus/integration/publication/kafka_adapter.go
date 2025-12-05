@@ -10,12 +10,12 @@ import (
 	"github.com/carlosgab83/matrix/go/internal/shared/integration/logging"
 )
 
-type KafkaPublicator struct {
+type KafkaPublisher struct {
 	Producer sarama.SyncProducer
 	Logger   logging.Logger
 }
 
-func NewKafkaPublicator(cfg domain.Config, logger logging.Logger) (*KafkaPublicator, error) {
+func NewKafkaPublisher(cfg domain.Config, logger logging.Logger) (*KafkaPublisher, error) {
 	brokers := []string{cfg.KafKaConsumerAddress}
 
 	config := sarama.NewConfig()
@@ -26,13 +26,13 @@ func NewKafkaPublicator(cfg domain.Config, logger logging.Logger) (*KafkaPublica
 		return nil, err
 	}
 
-	return &KafkaPublicator{
+	return &KafkaPublisher{
 		Producer: producer,
 		Logger:   logger,
 	}, nil
 }
 
-func (kp *KafkaPublicator) NewDBPrice(ctx context.Context, price shared_domain.Price) error {
+func (kp *KafkaPublisher) NewDBPrice(ctx context.Context, price shared_domain.Price) error {
 	b, err := json.Marshal(price)
 	if err != nil {
 		return err
@@ -52,6 +52,6 @@ func (kp *KafkaPublicator) NewDBPrice(ctx context.Context, price shared_domain.P
 	return nil
 }
 
-func (kp *KafkaPublicator) Close() error {
+func (kp *KafkaPublisher) Close() error {
 	return kp.Producer.Close()
 }

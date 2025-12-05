@@ -66,16 +66,16 @@ func (app *App) Run() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Create Publicator
-	publicator, err := publication.NewPublicator(app.Config, app.Logger)
+	// Create Publisher
+	publisher, err := publication.NewPublisher(app.Config, app.Logger)
 	if err != nil {
-		app.Logger.Error("Failed to create publicator", "error", err)
+		app.Logger.Error("Failed to create publisher", "error", err)
 		cancel()
 		return
 	}
 
 	// Create the domain service (inject dependencies via constructor)
-	ingestorService := service.NewIngestorService(ctx, app.Logger, app.PriceRepository, publicator)
+	ingestorService := service.NewIngestorService(ctx, app.Logger, app.PriceRepository, publisher)
 
 	// Create the gRPC server adapter (inject domain service)
 	grpcServerAdapter := ingestion.NewGRPCPriceIngestorServer(ctx, ingestorService, app.Logger)
