@@ -1,0 +1,95 @@
+# Inherit automatically generated configuration
+# inherit_from:
+#   - .rubocop_todo.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+  Exclude:
+    - 'vendor/**/*'
+    - 'bin/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+    - 'db/schema.rb'
+
+# -----------------------------
+# Style (general style)
+# -----------------------------
+Layout/LineLength:
+  Max: 120
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Style/Documentation:
+  Enabled: false   # disables requiring docstrings for every class
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19
+
+Style/NumericLiterals:
+  Enabled: false
+
+# -----------------------------
+# Lint (real errors)
+# -----------------------------
+Lint/UselessAssignment:
+  Enabled: true
+
+Lint/UnusedMethodArgument:
+  Enabled: true
+
+Lint/UnusedBlockArgument:
+  Enabled: true
+
+# -----------------------------
+# Metrics (complexity)
+# -----------------------------
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/ClassLength:
+  Max: 250
+
+Metrics/ModuleLength:
+  Max: 300
+
+Metrics/BlockLength:
+  Max: 30
+
+Metrics/ParameterLists:
+  Max: 5
+
+# -----------------------------
+# Performance cops
+# -----------------------------
+require:
+  - rubocop-performance
+  - rubocop-sorbet
+
+Performance:
+  Enabled: true
+
+# -----------------------------
+# Sorbet cops
+# -----------------------------
+Sorbet/SignatureBuildOrder:
+  Enabled: true
+
+Sorbet/ForbidIncludeConstLiteral:
+  Enabled: true
+
+Sorbet/ForbidUntypedStructProps:
+  Enabled: false
+
+Sorbet/StrictSigil:
+  Enabled: false  # No forzar # typed: strict en todos los archivos
+
+Sorbet/ValidSigil:
+  Enabled: true   # Validar que el sigil sea correcto
+
+Sorbet/EnforceSignatures:
+  Enabled: false  # No forzar sig en todos los métodos (demasiado estricto)

@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# Editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Test files
+spec/
+test/
+
+# Temporary files
+tmp/
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
