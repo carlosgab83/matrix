@@ -20,4 +20,4 @@ Architect::Domain::Registry.reload_from_dir!(rules_path)
 
 puts Architect::Domain::Registry.rules.inspect
 
-# Architect::Handler::App.run
+Architect::Handler::App.run

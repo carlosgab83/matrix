@@ -28,9 +28,11 @@ module Architect
         nil
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
       sig { params(rule: Rule, snapshot: T.untyped).returns(T::Boolean) }
       def matches?(rule, snapshot)
+        return false if rule.conditions.empty?
+
         rule.conditions.each do |condition|
           return false unless snapshot[condition.key]
           return false if rule.inclusion.any? && !rule.inclusion.include?(snapshot['symbol'])
@@ -54,7 +56,7 @@ module Architect
 
         true
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
     end
   end
 end

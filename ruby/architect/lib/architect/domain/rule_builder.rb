@@ -4,7 +4,7 @@
 require 'sorbet-runtime'
 require 'architect/domain/condition'
 require 'architect/domain/action'
-require "architect/domain/rule"
+require 'architect/domain/rule'
 
 module Architect
   module Domain
@@ -25,7 +25,7 @@ module Architect
 
       sig { params(type: T.any(String, Symbol)).void }
       def for_type(type)
-        @conditions << Condition.new(key: type.to_s, operator: :equals_to, value: type.to_s)
+        @conditions << Condition.new(key: 'type', operator: :equals_to, value: type.to_s)
       end
 
       sig { params(key: T.any(String, Symbol), operator: T.any(String, Symbol), value: T.untyped).void }
@@ -43,11 +43,11 @@ module Architect
         @exclusion = stock_symbol.is_a?(Array) ? stock_symbol : [stock_symbol]
       end
 
-      sig { params(method: String, args: T::Array[String]).void }
+      sig { params(method: Symbol, args: T.untyped).void }
       def method_missing(method, *args)
         case method.to_sym
         when :action
-          @actions << Action.new(action_type: T.must(args[0]).to_s, action_value: T.must(args[1]).to_s)
+          @actions << Action.new(action_type: args[0].to_s, action_value: args[1].to_s)
         end
       end
 

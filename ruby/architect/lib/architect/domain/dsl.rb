@@ -14,10 +14,6 @@ module Architect
         builder = RuleBuilder.new(name)
         builder.instance_eval(&block)
         Registry.add(builder.build)
-
-
-
-
       end
     end
   end
