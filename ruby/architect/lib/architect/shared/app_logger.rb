@@ -17,13 +17,14 @@ module Architect
           logger.formatter = proc do |severity, datetime, _progname, msg|
             "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity.ljust(5)} -- #{msg}\n"
           end
-          @logger = T.let(logger, T.nilable(Logger))
+          @instance = T.let(logger, T.nilable(Logger))
           logger
         end
 
         sig { returns(Logger) }
         def instance
-          @logger ||= setup
+          @instance = T.let(nil, T.nilable(Logger)) unless defined?(@instance)
+          @instance ||= setup
         end
 
         sig { params(message: String).void }
@@ -57,7 +58,6 @@ module Architect
         def parse_level(level)
           case level.to_s.downcase
           when 'debug' then Logger::DEBUG
-          when 'info' then Logger::INFO
           when 'warn', 'warning' then Logger::WARN
           when 'error' then Logger::ERROR
           when 'fatal' then Logger::FATAL

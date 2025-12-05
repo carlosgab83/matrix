@@ -13,7 +13,7 @@ module Architect
         interface!
 
         sig { abstract.params(_block: T.proc.params(message: T.untyped).void).void }
-        def receive(&); end
+        def receive(&_block); end
       end
 
       module ReceptionPortFactory

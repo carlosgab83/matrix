@@ -21,7 +21,7 @@ module Architect
         end
 
         sig { override.params(_block: T.proc.params(message: T.untyped).void).void }
-        def receive(&)
+        def receive(&_block)
           consumer = @kafka.consumer(group_id: @group_id)
           consumer.subscribe(@topic)
           @logger.info('Waiting for messages...')
@@ -38,7 +38,7 @@ module Architect
         rescue StandardError => e
           @logger.fatal("FATAL ERROR: #{e.class} - #{e.message}")
         ensure
-          consumer.stop if consumer
+          consumer&.stop
           @logger.info('Consumer stopped')
         end
       end

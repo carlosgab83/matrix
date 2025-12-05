@@ -5,6 +5,7 @@ require 'sorbet-runtime'
 require 'architect/integration/reception/reception_port'
 require 'architect/service/consumer'
 require 'architect/shared/app_logger'
+require 'architect/domain/registry'
 
 module Architect
   module Handler
@@ -19,6 +20,7 @@ module Architect
         receptor = Architect::Integration::Reception::ReceptionPortFactory.new_adapter(logger: logger)
 
         Architect::Service::Consumer.new(
+          registry: Architect::Domain::Registry,
           logger: logger,
           receptor: receptor,
           publisher: nil
