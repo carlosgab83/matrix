@@ -25,13 +25,19 @@ Style/Documentation:
   Enabled: false   # disables requiring docstrings for every class
 
 Style/ClassAndModuleChildren:
-  EnforcedStyle: compact
+  EnforcedStyle: nested   # Use nested modules for Sorbet compatibility
 
 Style/HashSyntax:
   EnforcedStyle: ruby19
 
 Style/NumericLiterals:
   Enabled: false
+
+Style/ArgumentsForwarding:
+  Enabled: false  # Disable anonymous block syntax (&) for Sorbet compatibility
+
+Naming/BlockForwarding:
+  Enabled: false  # Disable anonymous block syntax (&) for Sorbet compatibility
 
 # -----------------------------
 # Lint (real errors)

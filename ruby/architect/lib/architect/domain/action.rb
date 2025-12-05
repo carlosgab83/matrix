@@ -1,24 +1,23 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
+
+require 'sorbet-runtime'
 
 module Architect
   module Domain
     class Action
-      attr_reader :action_type, :action_value
+      extend T::Sig
 
+      sig { returns(String) }
+      attr_reader :action_type
+
+      sig { returns(String) }
+      attr_reader :action_value
+
+      sig { params(action_type: String, action_value: String).void }
       def initialize(action_type:, action_value:)
-        @action_type = action_type
-        @action_value = action_value
-        validate_action!
-      end
-
-      private
-
-      def validate_action!
-        return if action_type && action_value
-
-        raise Architect::Domain::Errors::InvalidRuleDefinition,
-              'Invalid action. Actions must have action_type and action_value'
+        @action_type = T.let(action_type, String)
+        @action_value = T.let(action_value, String)
       end
     end
   end
