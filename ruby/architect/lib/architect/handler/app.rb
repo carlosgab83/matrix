@@ -1,0 +1,33 @@
+# typed: strict
+# frozen_string_literal: true
+
+require 'sorbet-runtime'
+require 'architect/integration/reception/reception_port'
+require 'architect/integration/publication/publication_port'
+require 'architect/service/consumer'
+require 'architect/shared/app_logger'
+require 'architect/domain/registry'
+
+module Architect
+  module Handler
+    class App
+      extend T::Sig
+
+      sig { void }
+      def self.run
+        logger = Architect::Shared::AppLogger.instance
+        logger.info('Initializing Architect Handler')
+
+        receptor = Architect::Integration::Reception::ReceptionPortFactory.new_adapter(logger: logger)
+        publisher = Architect::Integration::Publication::PublicationPortFactory.new_adapter(logger: logger)
+
+        Architect::Service::Consumer.new(
+          registry: Architect::Domain::Registry,
+          logger: logger,
+          receptor: receptor,
+          publisher: publisher
+        ).call
+      end
+    end
+  end
+end

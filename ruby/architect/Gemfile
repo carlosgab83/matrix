@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+gem 'ruby-kafka', '~> 1.5'
+
+group :development do
+  gem 'rubocop', '~> 1.81'
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-sorbet', require: false
+  gem 'sorbet', '~> 0.6.12812'
+  gem 'sorbet-runtime', '~> 0.6.12812'
+  gem 'tapioca', '~> 0.17', require: false
+end
+
+group :test do
+  gem 'minitest-reporters', '1.7.1'
+  gem 'mocha', '2.8.2'
+end

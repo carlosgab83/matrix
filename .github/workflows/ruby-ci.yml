@@ -1,0 +1,69 @@
+name: Ruby CI
+
+on:
+  push:
+    branches: [ main, develop, add-architect ]
+    paths:
+      - 'ruby/**'
+      - '.rubocop.yml'
+      - '.github/workflows/ruby-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'ruby/**'
+      - '.rubocop.yml'
+      - '.github/workflows/ruby-ci.yml'
+
+jobs:
+  lint-and-typecheck:
+    name: RuboCop & Sorbet
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ruby/architect
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: ruby/architect
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run RuboCop
+        run: bundle exec rubocop -a
+
+      - name: Run Sorbet type check
+        run: bundle exec srb tc
+
+  test:
+    name: Minitest
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ruby/architect
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: ruby/architect
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run tests
+        run: bundle exec rake test

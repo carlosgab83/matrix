@@ -157,7 +157,7 @@ services:
     # TODO: Add healthcheck for Tank (in production)
 
   # ======================================================
-  # Oracle - Analytics & Alert Engine (Python)
+  # Oracle - Analytics & Snapshot Engine (Python)
   # ======================================================
   oracle:
     build:
@@ -171,8 +171,8 @@ services:
     environment:
       PYTHONUNBUFFERED: "1"
       KAFKA_BOOTSTRAP_SERVERS: nabucodonosor:9092
-      KAFKA_TOPIC: price-updates
-      KAFKA_GROUP_ID: oracle-consumer-group
+      KAFKA_TOPIC: price.db.new # Yet harcoded
+      KAFKA_GROUP_ID: price-analyzer # Yet harcoded
       LOG_LEVEL: info
     volumes:
       - ./python/oracle:/app
@@ -182,6 +182,28 @@ services:
     networks:
       - matrix-network
     # TODO: Add healthcheck for Oracle (in production)
+
+  # ======================================================
+  # Architect - Rules & Alert Engine (Ruby)
+  # ======================================================
+  architect:
+    build:
+      context: ./ruby/architect
+      dockerfile: Dockerfile
+    image: matrix-ruby-architect-dev:latest
+    container_name: architect
+    # depends_on:
+    #   - nabucodonosor
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: nabucodonosor:9092
+      LOG_LEVEL: info
+    volumes:
+      - ./ruby/architect:/app
+    working_dir: /app
+    command: ruby main.rb
+    restart: unless-stopped
+    networks:
+      - matrix-network
 
 networks:
   matrix-network:

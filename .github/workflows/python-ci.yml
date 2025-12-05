@@ -1,0 +1,35 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'python/**'
+      - '.github/workflows/python-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'python/**'
+      - '.github/workflows/python-ci.yml'
+
+jobs:
+  lint-and-test:
+    name: Python Lint & Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: python
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # TODO: Add linting and testing steps
+      - name: Placeholder
+        run: echo "Python CI pipeline - to be implemented"
